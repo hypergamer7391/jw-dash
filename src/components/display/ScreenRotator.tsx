@@ -384,6 +384,28 @@ export default function ScreenRotator({ screens: initialScreens, settings: initi
     onSwipeRight: () => { prevScreen(); resetRotation(); clearPause(); },
   });
 
+  // TV remotes send the same arrow keys as a keyboard. Keep the display
+  // navigable without requiring focus on the on-screen pagination controls.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const isLeft = event.key === 'ArrowLeft' || event.keyCode === 37;
+      const isRight = event.key === 'ArrowRight' || event.keyCode === 39;
+      if (!isLeft && !isRight) return;
+      if (event.target instanceof Element
+        && event.target.closest('input, textarea, select, [contenteditable="true"], [role="textbox"]')) return;
+
+      event.preventDefault();
+      if (!contentIsLive) wake();
+      if (isRight) nextScreen();
+      else prevScreen();
+      resetRotation();
+      clearPause();
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [clearPause, contentIsLive, nextScreen, prevScreen, resetRotation, wake]);
+
   // Chromium only honours overscroll-behavior at the document root (html/
   // body) — on an inner div it cannot suppress the edge-swipe history
   // gesture that would navigate the kiosk away from /display. Set it

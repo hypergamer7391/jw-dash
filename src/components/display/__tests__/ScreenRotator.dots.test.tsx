@@ -104,6 +104,30 @@ describe('ScreenRotator screen dots', () => {
     expect(rendered()).toBe('weather');
   });
 
+  it('changes screens with the left and right arrow keys', () => {
+    render(<ScreenRotator hubTimezone="UTC" screens={SCREENS} settings={makeSettings()} />);
+    act(() => { vi.advanceTimersByTime(0); });
+    expect(rendered()).toBe('home');
+
+    fireEvent.keyDown(window, { key: 'ArrowRight' });
+    expect(rendered()).toBe('weather');
+
+    fireEvent.keyDown(window, { key: 'ArrowLeft', keyCode: 37 });
+    expect(rendered()).toBe('home');
+  });
+
+  it('leaves arrow keys in text inputs alone', () => {
+    render(<ScreenRotator hubTimezone="UTC" screens={SCREENS} settings={makeSettings()} />);
+    act(() => { vi.advanceTimersByTime(0); });
+    const input = document.createElement('input');
+    document.body.append(input);
+
+    fireEvent.keyDown(input, { key: 'ArrowRight', keyCode: 39 });
+
+    expect(rendered()).toBe('home');
+    input.remove();
+  });
+
   it('releases a pause that was on when the dots were switched off', () => {
     // Never auto-resumes, so only the dots switch can release it.
     const paused = makeSettings({ pauseTimeoutSeconds: 0 });
