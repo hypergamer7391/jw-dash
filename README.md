@@ -374,3 +374,4 @@ Or build it as a [plugin](https://homescreens.dev/docs/plugins), with no core ch
 
 [MIT](LICENSE)
 # homescreen-jw
+# jw-dash
